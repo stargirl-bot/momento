@@ -98,7 +98,9 @@ class PageTitleFetcher
     end
 
     def request(uri, address)
-      http = Net::HTTP.new(uri.host, uri.port)
+      # hostname again, so an IPv6 literal arrives unbracketed — Net::HTTP
+      # raises URI::InvalidComponentError on the bracketed form.
+      http = Net::HTTP.new(uri.hostname, uri.port)
       # Connect to the address we already vetted while leaving Host, SNI, and
       # certificate verification bound to the original hostname. Without this
       # there is a window where DNS can be re-pointed at a private address
@@ -135,7 +137,12 @@ class PageTitleFetcher
       raise UnsafeUrl unless ALLOWED_PORTS.include?(uri.port)
       raise UnsafeUrl if uri.userinfo.present?
 
-      addresses = resolved_addresses(uri.host)
+      # hostname, not host: for an IPv6 literal, host keeps the brackets
+      # ("[::1]"), which never parses as an IPAddr. That silently downgraded
+      # every IPv6-literal URL to a DNS lookup, so it was only ever refused
+      # because the bracketed name failed to resolve — not because we checked
+      # the address.
+      addresses = resolved_addresses(uri.hostname)
       # Every answer must be public: with a mixed record set, allowing the good
       # one would let a retry land on the bad one.
       raise UnsafeUrl if addresses.any? { |address| blocked?(address) }
@@ -161,6 +168,15 @@ class PageTitleFetcher
     end
 
     def blocked?(address)
+      # Unwrap ::ffff:a.b.c.d to a.b.c.d before checking. Do not rely on IPAddr
+      # to do this: ipaddr 1.2.6 (the default gem on Ruby 3.3.x, which is what
+      # .ruby-version and CI use) reports loopback? and link_local? as false for
+      # the IPv4-mapped forms, so ::ffff:127.0.0.1 and — worse —
+      # ::ffff:169.254.169.254, the cloud metadata address, both read as public.
+      # ipaddr 1.2.8 fixed it, so this passed on a newer local Ruby and failed
+      # in CI. Unwrapping ourselves makes the check identical on both.
+      address = address.native if address.ipv4_mapped?
+
       return true if address.loopback? || address.private? || address.link_local?
 
       BLOCKED_RANGES.any? { |range| range.include?(address) }

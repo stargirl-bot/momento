@@ -80,6 +80,41 @@ class PageTitleFetcherTest < ActiveSupport::TestCase
     assert_nil PageTitleFetcher.call("http://[::ffff:169.254.169.254]/")
   end
 
+  # The test above went green for the wrong reason: verify_safe! read uri.host,
+  # which keeps the brackets on an IPv6 literal, so the address was never
+  # parsed — the URL was refused only because "[::ffff:...]" failed to resolve.
+  # These assert the address check itself, with no resolver in the path, and
+  # cover the ipaddr 1.2.6 gap where the mapped loopback and link-local forms
+  # both report as public.
+  test "blocks IPv4-mapped IPv6 addresses at the address check itself" do
+    fetcher = PageTitleFetcher.new("http://example.com")
+
+    [
+      "::ffff:127.0.0.1",       # loopback
+      "::ffff:10.0.0.1",        # private
+      "::ffff:192.168.1.1",     # private
+      "::ffff:169.254.169.254", # cloud metadata
+      "::1",                    # native loopback
+      "169.254.169.254"         # native metadata
+    ].each do |address|
+      assert fetcher.send(:blocked?, IPAddr.new(address)),
+             "expected #{address} to be blocked"
+    end
+  end
+
+  test "still allows the IPv4-mapped form of a public address" do
+    fetcher = PageTitleFetcher.new("http://example.com")
+
+    assert_not fetcher.send(:blocked?, IPAddr.new("::ffff:8.8.8.8")),
+               "expected the mapped form of a public address to be allowed"
+  end
+
+  test "parses an IPv6 literal host instead of sending it to the resolver" do
+    fetcher = PageTitleFetcher.new("http://[::1]/")
+
+    assert_equal [ IPAddr.new("::1") ], fetcher.send(:resolved_addresses, URI.parse("http://[::1]/").hostname)
+  end
+
   test "refuses credentials embedded in the url" do
     assert_nil PageTitleFetcher.call("http://admin:secret@example.com/")
   end
