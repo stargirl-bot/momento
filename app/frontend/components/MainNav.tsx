@@ -1,13 +1,14 @@
 import * as React from "react"
 import { Link, router, usePage } from "@inertiajs/react"
 import {
+  Bookmark,
   ChevronsLeft,
   ChevronsRight,
-  Home,
   LogOut,
   Menu,
   Settings,
   Shield,
+  Tag,
   User,
   X,
 } from "lucide-react"
@@ -24,7 +25,7 @@ import { cn } from "@/lib/utils"
 import type { PageProps } from "@/types/inertia"
 
 const STORAGE_KEY = "main-nav-open"
-const BRAND = "Build New"
+const BRAND = "Momento"
 
 export type NavItemDef = {
   href: string
@@ -35,10 +36,16 @@ export type NavItemDef = {
 
 const DEFAULT_NAV_ITEMS: NavItemDef[] = [
   {
-    href: "/dashboard",
-    icon: Home,
-    label: "Home",
-    match: (url) => url === "/" || url.startsWith("/dashboard"),
+    href: "/bookmarks",
+    icon: Bookmark,
+    label: "Bookmarks",
+    match: (url) => url === "/" || url.startsWith("/bookmarks"),
+  },
+  {
+    href: "/tags",
+    icon: Tag,
+    label: "Tags",
+    match: (url) => url.startsWith("/tags"),
   },
 ]
 
@@ -58,7 +65,7 @@ function useMainNavOpen() {
 
 export function MainNav({
   items = DEFAULT_NAV_ITEMS,
-  brandHref = "/dashboard",
+  brandHref = "/bookmarks",
 }: {
   items?: NavItemDef[]
   brandHref?: string

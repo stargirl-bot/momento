@@ -11,6 +11,8 @@ Disallow: /login
 Disallow: /signup
 Disallow: /logout
 Disallow: /passwords
+Disallow: /bookmarks
+Disallow: /tags
 Disallow: /dashboard
 Disallow: /settings
 Disallow: /profile

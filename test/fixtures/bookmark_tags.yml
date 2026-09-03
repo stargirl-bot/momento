@@ -1,0 +1,17 @@
+# rails_guides carries both design and react; inertia_docs carries only react.
+# That asymmetry is what the multi-tag AND filter is tested against.
+rails_design:
+  bookmark: rails_guides
+  tag: design
+
+rails_react:
+  bookmark: rails_guides
+  tag: react
+
+inertia_react:
+  bookmark: inertia_docs
+  tag: react
+
+other_design:
+  bookmark: other_users_bookmark
+  tag: other_design

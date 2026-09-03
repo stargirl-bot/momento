@@ -8,7 +8,16 @@ Rails.application.routes.draw do
 
   resources :passwords, param: :token, only: %i[ new create edit update ]
 
-  get "dashboard", to: "dashboard#show", as: :dashboard
+  # Declared ahead of the resource so it can never be shadowed. Hit with raw
+  # fetch() from the bookmark dialog, not Inertia's router.
+  get "bookmarks/title_preview", to: "bookmarks#title_preview", as: :bookmark_title_preview
+  resources :bookmarks, only: %i[ index create update destroy ]
+  resources :tags,      only: %i[ index update destroy ]
+
+  # Bookmarks replaced the starter dashboard as the logged-in home. Explicitly
+  # 302 — redirect() defaults to a 301, which browsers cache permanently and
+  # which we could never take back.
+  get "dashboard", to: redirect("/bookmarks", status: 302), as: :dashboard
   get "settings",  to: "settings#show",  as: :settings
 
   namespace :admin do

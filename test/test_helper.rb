@@ -13,3 +13,11 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+class ActionDispatch::IntegrationTest
+  # Every user fixture shares the same password (see test/fixtures/users.yml),
+  # so logging in only needs the record.
+  def log_in_as(user, password: "password")
+    post login_path, params: { email: user.email, password: password }
+  end
+end

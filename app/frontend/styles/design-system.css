@@ -28,6 +28,20 @@
   --color-danger: oklch(64% 0.22 25);
   --color-danger-faded: oklch(96% 0.025 25);
   --color-danger-display: oklch(55% 0.20 25);
+
+  /* Categorical tag colours. Eight hues, evenly spaced, used only as the small
+     dot on a tag pill — never as a text or background colour — so they only
+     need to be distinguishable from each other and visible on the page
+     surface, not to carry text contrast. Tag.COLORS in Ruby mirrors these
+     names and assigns one per tag. */
+  --color-tag-1: oklch(62% 0.19 15);
+  --color-tag-2: oklch(64% 0.16 65);
+  --color-tag-3: oklch(63% 0.16 125);
+  --color-tag-4: oklch(62% 0.15 165);
+  --color-tag-5: oklch(62% 0.16 230);
+  --color-tag-6: oklch(58% 0.19 275);
+  --color-tag-7: oklch(60% 0.20 310);
+  --color-tag-8: oklch(62% 0.20 345);
 }
 
 .dark {
@@ -46,6 +60,17 @@
   --color-danger: oklch(72% 0.20 22);
   --color-danger-faded: oklch(22% 0.05 22);
   --color-danger-display: oklch(82% 0.18 22);
+
+  /* Lifted lightness so the same eight hues stay legible against the near-black
+     page surface. */
+  --color-tag-1: oklch(74% 0.17 15);
+  --color-tag-2: oklch(78% 0.15 65);
+  --color-tag-3: oklch(78% 0.16 125);
+  --color-tag-4: oklch(76% 0.14 165);
+  --color-tag-5: oklch(75% 0.14 230);
+  --color-tag-6: oklch(70% 0.17 275);
+  --color-tag-7: oklch(72% 0.18 310);
+  --color-tag-8: oklch(74% 0.18 345);
 }
 
 @layer base {
@@ -237,6 +262,22 @@
     @apply absolute right-4 top-4 cursor-pointer rounded-sm text-ink-muted hover:text-ink-display;
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-accent;
   }
+
+  /* Tag dot — the colour carrier on a tag pill. Pair with a neutral <Badge>
+     rather than tinting the pill itself, so contrast stays governed by the
+     badge tones and only one token per colour is needed. */
+  .tag-dot {
+    @apply inline-block h-2 w-2 shrink-0 rounded-full;
+    background-color: var(--tag-dot-color, var(--color-ink-muted));
+  }
+  .tag-dot-tag-1 { --tag-dot-color: var(--color-tag-1); }
+  .tag-dot-tag-2 { --tag-dot-color: var(--color-tag-2); }
+  .tag-dot-tag-3 { --tag-dot-color: var(--color-tag-3); }
+  .tag-dot-tag-4 { --tag-dot-color: var(--color-tag-4); }
+  .tag-dot-tag-5 { --tag-dot-color: var(--color-tag-5); }
+  .tag-dot-tag-6 { --tag-dot-color: var(--color-tag-6); }
+  .tag-dot-tag-7 { --tag-dot-color: var(--color-tag-7); }
+  .tag-dot-tag-8 { --tag-dot-color: var(--color-tag-8); }
 
   /* Callouts */
   .callout {

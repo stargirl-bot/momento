@@ -1,0 +1,21 @@
+design:
+  user: one
+  name: design
+  color: tag-1
+
+react:
+  user: one
+  name: react
+  color: tag-2
+
+unused:
+  user: one
+  name: unused
+  color: tag-3
+
+# Same name as one's tag, owned by a different user — proves uniqueness is
+# scoped per user and that filtering never crosses accounts.
+other_design:
+  user: two
+  name: design
+  color: tag-1
