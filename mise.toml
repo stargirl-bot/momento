@@ -1,0 +1,7 @@
+# Pins this repo to the same Ruby that CI and .ruby-version use.
+#
+# Without this, the global mise config (~/.config/mise/config.toml) wins and
+# the shell here runs 4.0.5 while GitHub Actions runs 3.3.6 — so a green local
+# test run is only an approximation of CI.
+[tools]
+ruby = "3.3.6"
